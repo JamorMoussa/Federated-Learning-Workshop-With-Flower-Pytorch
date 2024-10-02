@@ -1,11 +1,10 @@
 import torch, torch.nn as nn
 
 
-
-class MnistModel(nn.Module):
+class MNISTModel(nn.Module):
 
     def __init__(self):
-        super(MnistModel, self).__init__()
+        super(MNISTModel, self).__init__()
 
         self.fc = nn.Sequential(
             nn.Linear(28 * 28, 128), 
@@ -16,7 +15,6 @@ class MnistModel(nn.Module):
             nn.ReLU(),
             nn.Linear(32, 10)
         )
-
 
     def forward(self, inputs: torch.Tensor):
         
