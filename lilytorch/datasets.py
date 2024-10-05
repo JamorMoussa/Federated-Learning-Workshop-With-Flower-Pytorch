@@ -1,5 +1,5 @@
-import torch 
-from torch.utils.data import Dataset
+import torch
+from torch.utils.data import Dataset, DataLoader, TensorDataset
 
 from torchvision import datasets
 import torchvision.transforms as T
@@ -10,30 +10,34 @@ import logging as log
 
 
 class FederatedMnistDataset(Dataset):
-        def __init__(self, data):
-            self.data = data
+    def __init__(self, data):
+        self.data = data
 
-        @staticmethod
-        def load(dir: str):
-            return torch.load(dir, weights_only= True)
+    @staticmethod
+    def load(filepath: str):
+        return torch.load(filepath, weights_only=False)
 
-        def save(self, save_dir: str):
-            torch.save(self.data, f = save_dir)
+    def save(self, save_dir: str):
+        images, labels = zip(*self.data)
+        images = torch.stack(images) 
+        labels = torch.tensor(labels)
 
-        def __len__(self):
-            return len(self.data)
+        dataset = TensorDataset(images, labels)
+        torch.save(dataset, save_dir)
 
-        def __getitem__(self, idx):
-            return self.data[idx]
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        return self.data[idx]
 
 
-def filter_train_dataset(trainset, exclude_digits: list[int]):
-     
-    return [(x, y) for x, y in trainset if y not in exclude_digits]
+def filter_dataset_by_class(dataset, exclude_digits: list[int]):
+    return [(x, y) for x, y in dataset if y not in exclude_digits]
 
 
 def create_federated_mnist_datasets(
-    root_dir: str | Path, 
+    root_dir: str | Path,
     save_dir: str | Path,
     exclude_digits_per_client: list[list[int]] = [[1, 3, 7], [2, 5, 8], [4, 6, 9]]
 ) -> tuple[FederatedMnistDataset]:
@@ -52,7 +56,7 @@ def create_federated_mnist_datasets(
     ])
 
     if not Path(osp.join(root_dir, "MNIST")).exists():
-         log.info("start downloading the mnist dataset.")
+        log.info("Start downloading the MNIST dataset.")
 
     trainset = datasets.MNIST(
         root=root_dir, download=True, train=True, transform=transform
@@ -62,42 +66,21 @@ def create_federated_mnist_datasets(
         root=root_dir, download=True, train=False, transform=transform
     )
 
-    log.info("The donwloding is completed")
+    log.info("Downloading completed")
 
-    log.info("saving federated mnist for client 1 ...")    
+    for client_idx, exclude_digits in enumerate(exclude_digits_per_client, 1):
+        log.info(f"Saving federated MNIST for client {client_idx} ...")
+        FederatedMnistDataset(
+            data=filter_dataset_by_class(
+                dataset=trainset, exclude_digits=exclude_digits
+            )
+        ).save(save_dir=osp.join(save_dir, f"mnist-client-{client_idx}.pt"))
 
+    log.info("Saving global test dataset ...")
     FederatedMnistDataset(
-         data= filter_train_dataset(
-                trainset= trainset, exclude_digits= exclude_digits_per_client[0]
-        )
-    ).save(save_dir=osp.join(save_dir, "mnsit-client-1.pt") )
+        data=list(zip(testset.data, testset.targets)) 
+    ).save(save_dir=osp.join(save_dir, "mnist-global-test-set.pt"))
 
-    log.info("saving federated mnist for client 2 ...")
-
-    FederatedMnistDataset(
-         data= filter_train_dataset(
-              trainset= trainset, exclude_digits= exclude_digits_per_client[1]
-        )
-    ).save(save_dir=osp.join(save_dir, "mnsit-client-2.pt") )
-
-    log.info("saving federated mnist for client 3 ...")
-
-    FederatedMnistDataset(
-         data= filter_train_dataset(
-              trainset= trainset, exclude_digits= exclude_digits_per_client[1]
-        )
-    ).save(save_dir=osp.join(save_dir, "mnsit-client-3.pt"))
-
-
-    log.info("saving test dataset ...")
-
-    FederatedMnistDataset(
-        data= (testset.data, testset.targets)
-    ).save(save_dir=osp.join(save_dir, "mnsit-global-test-set.pt"))
-
-    log.info("finished ...")
-
-
-
+    log.info("Finished ...")
 
 
