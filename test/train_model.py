@@ -12,7 +12,11 @@ if __name__ == "__main__":
 
     dataset = lt.datasets.FederatedMnistDataset.load("./save/mnist-client-1.pt")
 
+    test_set = lt.datasets.FederatedMnistDataset.load("./save/mnist-global-test-set.pt")
+
+
     train_loader = DataLoader(dataset=dataset, batch_size=32, shuffle=True)
+    test_loader = DataLoader(dataset=test_set, batch_size=32)
 
     loss_fn = nn.CrossEntropyLoss()
     
@@ -23,7 +27,12 @@ if __name__ == "__main__":
         train_loader= train_loader,
         criterion= loss_fn,
         optimizer= opt, 
+        epochs= 1,
         device= torch.device("cpu"),
-        epochs= 10
     )
 
+    model.evaluate_model(
+        test_loader= test_loader,
+        criterion= loss_fn,
+        device= torch.device("cpu")
+    )

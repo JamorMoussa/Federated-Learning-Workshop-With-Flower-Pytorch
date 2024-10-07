@@ -78,7 +78,7 @@ def create_federated_mnist_datasets(
 
     log.info("Saving global test dataset ...")
     FederatedMnistDataset(
-        data=list(zip(testset.data, testset.targets)) 
+        data=list(zip(testset.data.type(torch.float32), testset.targets)) 
     ).save(save_dir=osp.join(save_dir, "mnist-global-test-set.pt"))
 
     log.info("Finished ...")

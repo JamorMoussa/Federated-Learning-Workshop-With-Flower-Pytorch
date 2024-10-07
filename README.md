@@ -2,6 +2,10 @@
 
 
 
+```bash
+conda create -n fed-env python=3.11.9
+```
+
 
 ### 01. Create Federated Mnist dataset for three clients
 
