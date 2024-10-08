@@ -30,6 +30,12 @@ pip install -r requirements.txt
 
 Generate and save the federated MNIST dataset for three clients by running the following command:
 
+First create a `save` directory
+
+```bash
+mkdir save
+```
+
 ```bash
 python create_fedatasets.py --root_dir=./data --save_dir=./save
 ```
