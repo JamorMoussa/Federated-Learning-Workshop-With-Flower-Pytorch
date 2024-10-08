@@ -27,8 +27,8 @@ class FlowerClient(NumPyClient):
         self.trainset = trainset
         self.testset = testset
 
-        self.train_loader = DataLoader(dataset=trainset, batch_size=35, shuffle=True)
-        self.testset_loader = DataLoader(dataset=testset, batch_size=35, shuffle=True)
+        self.train_loader = DataLoader(dataset=self.trainset, batch_size=35, shuffle=True)
+        self.test_loader = DataLoader(dataset=self.testset, batch_size=35)
 
         self.loss_fn = nn.CrossEntropyLoss()
         
@@ -54,10 +54,10 @@ class FlowerClient(NumPyClient):
         set_weights(self.net, parameters)
         
         loss, accuracy = self.net.evaluate_model(
-            test_loader=self.testset_loader,
+            test_loader=self.test_loader,
             criterion= self.loss_fn,
             device= torch.device("cpu")
         )
-        return loss, len(self.testset_loader), {"accuracy": accuracy}
+        return loss, len(self.test_loader), {"accuracy": accuracy}
 
 

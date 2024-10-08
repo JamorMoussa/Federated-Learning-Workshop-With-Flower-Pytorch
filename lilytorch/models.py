@@ -50,9 +50,12 @@ class MNISTModel(nn.Module):
 
             epoch_loss = running_loss / len(train_loader)
             accuracy = 100 * correct / total
-            print(f"Epoch [{epoch + 1}/{epochs}], Loss: {epoch_loss:.4f}, Accuracy: {accuracy:.2f}%")
 
-        print("Training completed.")
+            print("\n\n", "="* 7, "Training Mode", "="*24)
+            print(f"Epoch [{epoch + 1}/{epochs}], Loss: {epoch_loss:.4f}, Accuracy: {accuracy:.2f}%")
+            print("="* 44, "\n\n")
+
+        # print("Training completed.")
 
     def evaluate_model(self, test_loader, criterion, device="cpu"):
         self.eval()  # Set the model to evaluation mode
@@ -78,6 +81,9 @@ class MNISTModel(nn.Module):
 
         average_loss = total_loss / len(test_loader)
         accuracy = 100 * correct / total
-        print(f"Test Loss: {average_loss:.4f}, Accuracy: {accuracy:.2f}%")
 
+        print("="* 7, "Eval Mode", "="*24)
+        print(f"Test Loss: {average_loss:.4f}, Accuracy: {accuracy:.2f}%")
+        print("="* 44, "\n\n")
+        
         return average_loss, accuracy
