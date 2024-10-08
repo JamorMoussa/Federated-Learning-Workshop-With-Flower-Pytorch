@@ -48,7 +48,7 @@ def create_federated_mnist_datasets(
     save_dir = Path(save_dir)
 
     if not root_dir.exists(): root_dir.mkdir()
-    if not save_dir.exists(): raise FileNotFoundError("No such save directory")
+    if not save_dir.exists(): save_dir.mkdir()
 
     transform = T.Compose([
         T.ToTensor(), 
