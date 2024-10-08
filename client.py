@@ -29,7 +29,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     client = fl.client.start_client(
-        server_address= "0.0.0.0:8080",
+        server_address= "localhost:8080",
         client= FlowerClient(
             client_id= args.client_id,
             trainset= train_set, 
